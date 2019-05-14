@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package recordmatcher;
+
+message Config {
+  repeated int32 processed_records = 1;
+}
