@@ -118,7 +118,7 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 func (s *Server) GetState() []*pbg.State {
 
 	return []*pbg.State{
-		&pbg.State{Key: "saved_scores", Value: int64(len(s.config.SavedScores))},
+		&pbg.State{Key: "processed_records", Value: int64(len(s.config.ProcessedRecords))},
 	}
 }
 
