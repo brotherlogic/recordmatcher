@@ -16,10 +16,22 @@ type getter interface {
 
 func (s *Server) processRecords(ctx context.Context) error {
 	startTime := time.Now()
-	_, err := s.getter.getRecords(ctx)
+	recs, err := s.getter.getRecords(ctx)
 
 	if err != nil {
 		return err
+	}
+
+	matches := make(map[int32][]*pbrc.Record)
+	for _, r := range recs {
+		matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+	}
+
+	for parent, records := range matches {
+		if len(records) > 1 {
+			s.Log(fmt.Sprintf("Found match: %v", parent))
+			return nil
+		}
 	}
 
 	s.Log(fmt.Sprintf("Processed in %v", time.Now().Sub(startTime)))
