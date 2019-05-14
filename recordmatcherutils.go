@@ -28,9 +28,14 @@ func (s *Server) processRecords(ctx context.Context) error {
 	}
 
 	for parent, records := range matches {
-		if len(records) > 1 {
-			s.Log(fmt.Sprintf("Found match: %v", parent))
-			return nil
+		if len(records) > 2 {
+			s.Log(fmt.Sprintf("Found super match: %v", parent))
+		}
+
+		if len(records) == 2 {
+			if len(records[0].GetRelease().Tracklist) == len(records[1].GetRelease().Tracklist) {
+				s.Log(fmt.Sprintf("Found equal match: %v", parent))
+			}
 		}
 	}
 
