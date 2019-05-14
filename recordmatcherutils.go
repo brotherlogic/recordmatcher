@@ -16,7 +16,7 @@ type getter interface {
 
 func (s *Server) processRecords(ctx context.Context) error {
 	startTime := time.Now()
-	records, err := s.getter.getRecords(ctx)
+	_, err := s.getter.getRecords(ctx)
 
 	if err != nil {
 		return err
