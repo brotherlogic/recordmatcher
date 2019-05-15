@@ -26,6 +26,7 @@ type Server struct {
 	*goserver.GoServer
 	getter getter
 	config *pb.Config
+	count  int
 }
 
 type prodGetter struct {
@@ -119,6 +120,7 @@ func (s *Server) GetState() []*pbg.State {
 
 	return []*pbg.State{
 		&pbg.State{Key: "processed_records", Value: int64(len(s.config.ProcessedRecords))},
+		&pbg.State{Key: "found_records", Value: int64(s.count)},
 	}
 }
 
