@@ -46,7 +46,7 @@ func TestVeryBasicTest(t *testing.T) {
 
 func TestBasicTest(t *testing.T) {
 	s := InitTest()
-	s.getter = &testGetter{rec: []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}}}
+	s.getter = &testGetter{rec: []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123, FolderId: 242017}}}}
 	err := s.processRecords(context.Background())
 	if err != nil {
 		t.Errorf("Failed: %v", err)

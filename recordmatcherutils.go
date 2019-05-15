@@ -33,7 +33,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 		}
 
 		if len(records) == 2 {
-			if len(records[0].GetRelease().Tracklist) == len(records[1].GetRelease().Tracklist) {
+			if len(records[0].GetRelease().Tracklist) == len(records[1].GetRelease().Tracklist) && (records[0].GetRelease().FolderId == 242017 || records[1].GetRelease().FolderId == 242017) {
 				s.Log(fmt.Sprintf("Found equal match: %v", parent))
 			}
 		}
