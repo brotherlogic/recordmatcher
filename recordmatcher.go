@@ -58,7 +58,7 @@ func (p prodGetter) update(ctx context.Context, r *pbrc.Record) error {
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	_, err = client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Requestor: "recordprocess", Update: r})
+	_, err = client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Requestor: "recordmatcher", Update: r})
 	if err != nil {
 		return err
 	}
