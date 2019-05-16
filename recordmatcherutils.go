@@ -25,7 +25,9 @@ func (s *Server) processRecords(ctx context.Context) error {
 
 	matches := make(map[int32][]*pbrc.Record)
 	for _, r := range recs {
-		matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+		if r.GetRelease().MasterId > 0 {
+			matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+		}
 	}
 
 	for parent, records := range matches {
@@ -36,6 +38,14 @@ func (s *Server) processRecords(ctx context.Context) error {
 		if len(records) == 2 {
 			if len(records[0].GetRelease().Tracklist) == len(records[1].GetRelease().Tracklist) && (records[0].GetRelease().FolderId == 242017 || records[1].GetRelease().FolderId == 242017) {
 				s.count++
+			}
+		}
+
+		if len(records) == 1 && !records[0].GetMetadata().NeedsStockCheck && time.Now().Sub(time.Unix(records[0].GetMetadata().LastStockCheck, 0)) > time.Hour*24*30*6 {
+			records[0].GetMetadata().NeedsStockCheck = true
+			err := s.getter.update(ctx, records[0])
+			if err != nil {
+				return err
 			}
 		}
 	}
