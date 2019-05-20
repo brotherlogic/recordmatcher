@@ -67,7 +67,10 @@ func (p prodGetter) update(ctx context.Context, r *pbrc.Record) error {
 
 // Init builds the server
 func Init() *Server {
-	s := &Server{GoServer: &goserver.GoServer{}}
+	s := &Server{
+		GoServer: &goserver.GoServer{},
+		config:   &pb.Config{},
+	}
 	s.getter = &prodGetter{s.DialMaster}
 	s.GoServer.KSclient = *keystoreclient.GetClient(s.GetIP)
 	return s
