@@ -42,7 +42,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 			}
 		}
 
-		if len(records) == 1 && !records[0].GetMetadata().NeedsStockCheck && time.Now().Sub(time.Unix(records[0].GetMetadata().LastStockCheck, 0)) > time.Hour*24*30*6 {
+		if len(records) == 1 && !records[0].GetMetadata().NeedsStockCheck && time.Now().Sub(time.Unix(records[0].GetMetadata().LastStockCheck, 0)) > time.Hour*24*30*6 && records[0].GetMetadata().Keep != pbrc.ReleaseMetadata_KEEPER {
 			records[0].GetMetadata().NeedsStockCheck = true
 			err := s.getter.update(ctx, records[0])
 			if err != nil {
