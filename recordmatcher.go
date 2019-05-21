@@ -67,7 +67,10 @@ func (p prodGetter) update(ctx context.Context, r *pbrc.Record) error {
 
 // Init builds the server
 func Init() *Server {
-	s := &Server{GoServer: &goserver.GoServer{}}
+	s := &Server{
+		GoServer: &goserver.GoServer{},
+		config:   &pb.Config{},
+	}
 	s.getter = &prodGetter{s.DialMaster}
 	s.GoServer.KSclient = *keystoreclient.GetClient(s.GetIP)
 	return s
@@ -117,7 +120,6 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-
 	return []*pbg.State{
 		&pbg.State{Key: "processed_records", Value: int64(len(s.config.ProcessedRecords))},
 		&pbg.State{Key: "found_records", Value: int64(s.count)},
