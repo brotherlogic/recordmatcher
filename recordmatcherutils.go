@@ -37,7 +37,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 
 		if len(records) == 2 {
 
-			if len(records[0].GetRelease().Tracklist) == len(records[1].GetRelease().Tracklist) && (records[0].GetRelease().FolderId == 242017 || records[1].GetRelease().FolderId == 242017) {
+			if len(records[0].GetRelease().Tracklist) == len(records[1].GetRelease().Tracklist) {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
 					records[0].GetMetadata().Match = pbrc.ReleaseMetadata_FULL_MATCH
 					err := s.getter.update(ctx, records[0])
