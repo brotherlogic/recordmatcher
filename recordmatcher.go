@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	"github.com/brotherlogic/goserver/utils"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pb "github.com/brotherlogic/recordmatcher/proto"
 )
@@ -72,7 +73,7 @@ func Init() *Server {
 		config:   &pb.Config{},
 	}
 	s.getter = &prodGetter{s.DialMaster}
-	s.GoServer.KSclient = *keystoreclient.GetClient(s.GetIP)
+	s.GoServer.KSclient = *keystoreclient.GetClient(s.DialMaster)
 	return s
 }
 
@@ -128,6 +129,7 @@ func (s *Server) GetState() []*pbg.State {
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
+	var init = flag.Bool("init", false, "Init the system")
 	flag.Parse()
 
 	//Turn off logging
@@ -140,6 +142,14 @@ func main() {
 	server.Register = server
 
 	server.RegisterServer("recordmatcher", false)
+
+	if *init {
+		ctx, cancel := utils.BuildContext("recordmatcher", "recordmatcher")
+		defer cancel()
+		server.config.TotalProcessed++
+		server.saveConfig(ctx)
+		return
+	}
 
 	server.RegisterRepeatingTask(server.processRecords, "process_records", time.Second*5)
 	server.Serve()
