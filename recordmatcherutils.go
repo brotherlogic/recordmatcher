@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/net/context"
 
+	pbgd "github.com/brotherlogic/godiscogs"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 )
 
@@ -32,18 +33,24 @@ func (s *Server) processRecords(ctx context.Context) error {
 	}
 
 	matches := make(map[int32][]*pbrc.Record)
+	trackNumbers := make(map[int32]int)
 	for _, r := range recs {
 		if r.GetRelease().MasterId > 0 {
 			matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
 		}
-	}
 
-	s.Log(fmt.Sprintf("MATCHES %v and %v,%v", len(matches[32375]), len(matches[32375][0].GetRelease().Tracklist), len(matches[32375][1].GetRelease().Tracklist)))
+		trackNumbers[r.GetRelease().Id] = 0
+		for _, track := range r.GetRelease().Tracklist {
+			if track.TrackType == pbgd.Track_TRACK {
+				trackNumbers[r.GetRelease().Id]++
+			}
+		}
+	}
 
 	for _, records := range matches {
 		if len(records) == 2 {
 
-			if len(records[0].GetRelease().Tracklist) == len(records[1].GetRelease().Tracklist) {
+			if trackNumbers[records[0].GetRelease().Id] == trackNumbers[records[1].GetRelease().Id] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
 					records[0].GetMetadata().Match = pbrc.ReleaseMetadata_FULL_MATCH
 					err := s.getter.update(ctx, records[0])
