@@ -38,7 +38,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 		}
 	}
 
-	s.Log(fmt.Sprintf("MATCHES %v", matches[32375]))
+	s.Log(fmt.Sprintf("MATCHES %v and %v,%v", len(matches[32375]), len(matches[32375][0].GetRelease().Tracklist), len(matches[32375][1].GetRelease().Tracklist)))
 
 	for _, records := range matches {
 		if len(records) == 2 {
