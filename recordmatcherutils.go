@@ -43,15 +43,14 @@ func (s *Server) processRecords(ctx context.Context) error {
 		trackNumbers[r.GetRelease().InstanceId] = 0
 		for _, track := range r.GetRelease().Tracklist {
 			if track.TrackType == pbgd.Track_TRACK {
-				trackNumbers[r.GetRelease().Id]++
+				trackNumbers[r.GetRelease().InstanceId]++
 			}
 		}
 	}
 
-	s.Log(fmt.Sprintf("Matching %v", matches[5918425]))
+	s.Log(fmt.Sprintf("Matching %v %v vs %v", len(matches[5918425]), trackNumbers[matches[5918425][0].GetRelease().InstanceId]))
 	for _, records := range matches {
 		if len(records) == 2 {
-
 			if trackNumbers[records[0].GetRelease().InstanceId] == trackNumbers[records[1].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
 					records[0].GetMetadata().Match = pbrc.ReleaseMetadata_FULL_MATCH
