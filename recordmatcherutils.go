@@ -36,9 +36,11 @@ func (s *Server) processRecords(ctx context.Context) error {
 	for _, r := range recs {
 		if r.GetRelease().MasterId > 0 {
 			matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+		} else {
+			matches[r.GetRelease().Id] = append(matches[r.GetRelease().Id], r)
 		}
 
-		trackNumbers[r.GetRelease().Id] = 0
+		trackNumbers[r.GetRelease().InstanceId] = 0
 		for _, track := range r.GetRelease().Tracklist {
 			if track.TrackType == pbgd.Track_TRACK {
 				trackNumbers[r.GetRelease().Id]++
@@ -50,7 +52,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 	for _, records := range matches {
 		if len(records) == 2 {
 
-			if trackNumbers[records[0].GetRelease().Id] == trackNumbers[records[1].GetRelease().Id] {
+			if trackNumbers[records[0].GetRelease().InstanceId] == trackNumbers[records[1].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
 					records[0].GetMetadata().Match = pbrc.ReleaseMetadata_FULL_MATCH
 					err := s.getter.update(ctx, records[0])
