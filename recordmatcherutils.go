@@ -25,7 +25,6 @@ func (s *Server) requiresStockCheck(ctx context.Context, r *pbrc.Record) bool {
 
 func (s *Server) processRecords(ctx context.Context) error {
 	count := 0
-	startTime := time.Now()
 	recs, err := s.getter.getRecords(ctx)
 
 	if err != nil {
@@ -47,6 +46,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 		}
 	}
 
+	s.Log(fmt.Sprintf("Matching %v", matches[5918425]))
 	for _, records := range matches {
 		if len(records) == 2 {
 
@@ -71,6 +71,5 @@ func (s *Server) processRecords(ctx context.Context) error {
 	}
 
 	s.count = count
-	s.Log(fmt.Sprintf("Processed in %v", time.Now().Sub(startTime)))
 	return nil
 }
