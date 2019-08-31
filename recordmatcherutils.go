@@ -48,7 +48,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 		}
 	}
 
-	s.Log(fmt.Sprintf("Matching %v %v vs %v", len(matches[5918425]), trackNumbers[matches[5918425][0].GetRelease().InstanceId]))
+	s.Log(fmt.Sprintf("Matching %v %v vs %v", len(matches[5918425]), trackNumbers[matches[5918425][0].GetRelease().InstanceId], trackNumbers[matches[5918425][1].GetRelease().InstanceId]))
 	for _, records := range matches {
 		if len(records) == 2 {
 			if trackNumbers[records[0].GetRelease().InstanceId] == trackNumbers[records[1].GetRelease().InstanceId] {
