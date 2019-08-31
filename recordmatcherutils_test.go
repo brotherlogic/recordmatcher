@@ -65,6 +65,14 @@ func TestBasicTest(t *testing.T) {
 		t.Errorf("Failed: %v", err)
 	}
 }
+func TestBasicNoMasterTest(t *testing.T) {
+	s := InitTest()
+	s.getter = &testGetter{rec: []*pbrc.Record{&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{Id: 123}}, &pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{Id: 123, FolderId: 242017, Tracklist: []*pbgd.Track{&pbgd.Track{Title: "Test", TrackType: pbgd.Track_TRACK}}}}}}
+	err := s.processRecords(context.Background())
+	if err != nil {
+		t.Errorf("Failed: %v", err)
+	}
+}
 
 func TestBasicTestWithFail(t *testing.T) {
 	s := InitTest()
