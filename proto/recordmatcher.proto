@@ -5,4 +5,5 @@ package recordmatcher;
 message Config {
   repeated int32 processed_records = 1;
   int64 totalProcessed = 2;
+  int64 last_run = 3;
 }

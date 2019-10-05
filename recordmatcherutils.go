@@ -70,5 +70,6 @@ func (s *Server) processRecords(ctx context.Context) error {
 	}
 
 	s.count = count
+	s.config.LastRun = time.Now().Unix()
 	return nil
 }
