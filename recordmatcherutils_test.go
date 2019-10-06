@@ -38,6 +38,9 @@ func (t *testGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Rec
 }
 
 func (t *testGetter) getRecordsSince(ctx context.Context, ti int64) ([]int32, error) {
+	if t.fail {
+		return []int32{}, fmt.Errorf("Built to fail")
+	}
 	return []int32{t.rec[0].GetRelease().InstanceId}, nil
 }
 
