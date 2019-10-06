@@ -33,10 +33,28 @@ func (t *testGetter) update(ctx context.Context, r *pbrc.Record) error {
 	return nil
 }
 
+func (t *testGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
+	return t.rec[0], nil
+}
+
+func (t *testGetter) getRecordsSince(ctx context.Context, ti int64) ([]int32, error) {
+	if t.fail {
+		return []int32{}, fmt.Errorf("Built to fail")
+	}
+	return []int32{t.rec[0].GetRelease().InstanceId}, nil
+}
+
+func (t *testGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32, error) {
+	return []int32{t.rec[0].GetRelease().InstanceId}, nil
+}
+func (t *testGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, error) {
+	return []int32{t.rec[0].GetRelease().InstanceId}, nil
+}
+
 func InitTest() *Server {
 	s := Init()
 	s.SkipLog = true
-	s.getter = &testGetter{}
+	s.getter = &testGetter{rec: []*pbrc.Record{&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{InstanceId: 123}}}}
 	s.GoServer.KSclient = *keystoreclient.GetTestClient(".testing")
 
 	return s
@@ -109,7 +127,7 @@ func TestNeedsStockCheckWithUpdateFail(t *testing.T) {
 
 func TestBasicTestSuper(t *testing.T) {
 	s := InitTest()
-	s.getter = &testGetter{rec: []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}}}
+	s.getter = &testGetter{rec: []*pbrc.Record{&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}}}
 	err := s.processRecords(context.Background())
 	if err != nil {
 		t.Errorf("Failed: %v", err)

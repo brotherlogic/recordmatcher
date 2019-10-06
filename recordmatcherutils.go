@@ -11,6 +11,10 @@ import (
 
 type getter interface {
 	getRecords(ctx context.Context) ([]*pbrc.Record, error)
+	getRecord(ctx context.Context, id int32) (*pbrc.Record, error)
+	getRecordsWithMaster(ctx context.Context, masterID int32) ([]int32, error)
+	getRecordsWithID(ctx context.Context, id int32) ([]int32, error)
+	getRecordsSince(ctx context.Context, t int64) ([]int32, error)
 	update(ctx context.Context, r *pbrc.Record) error
 }
 
@@ -24,7 +28,7 @@ func (s *Server) requiresStockCheck(ctx context.Context, r *pbrc.Record) bool {
 
 func (s *Server) processRecords(ctx context.Context) error {
 	count := 0
-	recs, err := s.getter.getRecords(ctx)
+	recs, err := s.getter.getRecordsSince(ctx, s.config.LastRun)
 
 	if err != nil {
 		return err
@@ -32,11 +36,37 @@ func (s *Server) processRecords(ctx context.Context) error {
 
 	matches := make(map[int32][]*pbrc.Record)
 	trackNumbers := make(map[int32]int)
-	for _, r := range recs {
+	for _, id := range recs {
+		r, err := s.getter.getRecord(ctx, id)
+		if err != nil {
+			return err
+		}
+
 		if r.GetRelease().MasterId > 0 {
-			matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+			mrecs, err := s.getter.getRecordsWithMaster(ctx, r.GetRelease().MasterId)
+			if err != nil {
+				return err
+			}
+			for _, mrec := range mrecs {
+				r, err = s.getter.getRecord(ctx, mrec)
+				if err != nil {
+					return err
+				}
+				matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+			}
 		} else {
-			matches[r.GetRelease().Id] = append(matches[r.GetRelease().Id], r)
+			mrecs, err := s.getter.getRecordsWithID(ctx, r.GetRelease().Id)
+			if err != nil {
+				return err
+			}
+			for _, mrec := range mrecs {
+				r, err = s.getter.getRecord(ctx, mrec)
+				if err != nil {
+					return err
+				}
+				matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+			}
+
 		}
 
 		trackNumbers[r.GetRelease().InstanceId] = 0
