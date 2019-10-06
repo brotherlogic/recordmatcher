@@ -51,6 +51,74 @@ func (p prodGetter) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	return resp.GetRecords(), nil
 }
 
+func (p prodGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
+	conn, err := p.dial("recordcollection")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	req := &pbrc.GetRecordRequest{InstanceId: instanceID}
+	resp, err := client.GetRecord(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetRecord(), nil
+}
+
+func (p prodGetter) getRecordsSince(ctx context.Context, t int64) ([]int32, error) {
+	conn, err := p.dial("recordcollection")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	req := &pbrc.QueryRecordsRequest{Query: &pbrc.QueryRecordsRequest_UpdateTime{t}}
+	resp, err := client.QueryRecords(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetInstanceIds(), nil
+}
+
+func (p prodGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32, error) {
+	conn, err := p.dial("recordcollection")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	req := &pbrc.QueryRecordsRequest{Query: &pbrc.QueryRecordsRequest_MasterId{m}}
+	resp, err := client.QueryRecords(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetInstanceIds(), nil
+}
+
+func (p prodGetter) getRecordsWithId(ctx context.Context, i int32) ([]int32, error) {
+	conn, err := p.dial("recordcollection")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	req := &pbrc.QueryRecordsRequest{Query: &pbrc.QueryRecordsRequest_ReleaseId{i}}
+	resp, err := client.QueryRecords(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetInstanceIds(), nil
+}
+
 func (p prodGetter) update(ctx context.Context, r *pbrc.Record) error {
 	conn, err := p.dial("recordcollection")
 	if err != nil {
