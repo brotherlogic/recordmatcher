@@ -47,7 +47,7 @@ func (t *testGetter) getRecordsSince(ctx context.Context, ti int64) ([]int32, er
 func (t *testGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32, error) {
 	return []int32{t.rec[0].GetRelease().InstanceId}, nil
 }
-func (t *testGetter) getRecordsWithId(ctx context.Context, i int32) ([]int32, error) {
+func (t *testGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, error) {
 	return []int32{t.rec[0].GetRelease().InstanceId}, nil
 }
 

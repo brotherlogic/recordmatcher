@@ -102,7 +102,7 @@ func (p prodGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32,
 	return resp.GetInstanceIds(), nil
 }
 
-func (p prodGetter) getRecordsWithId(ctx context.Context, i int32) ([]int32, error) {
+func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, error) {
 	conn, err := p.dial("recordcollection")
 	if err != nil {
 		return nil, err

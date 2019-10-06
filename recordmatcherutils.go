@@ -13,7 +13,7 @@ type getter interface {
 	getRecords(ctx context.Context) ([]*pbrc.Record, error)
 	getRecord(ctx context.Context, id int32) (*pbrc.Record, error)
 	getRecordsWithMaster(ctx context.Context, masterID int32) ([]int32, error)
-	getRecordsWithId(ctx context.Context, id int32) ([]int32, error)
+	getRecordsWithID(ctx context.Context, id int32) ([]int32, error)
 	getRecordsSince(ctx context.Context, t int64) ([]int32, error)
 	update(ctx context.Context, r *pbrc.Record) error
 }
@@ -55,7 +55,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 				matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
 			}
 		} else {
-			mrecs, err := s.getter.getRecordsWithId(ctx, r.GetRelease().Id)
+			mrecs, err := s.getter.getRecordsWithID(ctx, r.GetRelease().Id)
 			if err != nil {
 				return err
 			}
