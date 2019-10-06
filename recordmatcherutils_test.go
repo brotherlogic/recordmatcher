@@ -124,7 +124,7 @@ func TestNeedsStockCheckWithUpdateFail(t *testing.T) {
 
 func TestBasicTestSuper(t *testing.T) {
 	s := InitTest()
-	s.getter = &testGetter{rec: []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}}}
+	s.getter = &testGetter{rec: []*pbrc.Record{&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}, &pbrc.Record{Release: &pbgd.Release{MasterId: 123}}}}
 	err := s.processRecords(context.Background())
 	if err != nil {
 		t.Errorf("Failed: %v", err)
