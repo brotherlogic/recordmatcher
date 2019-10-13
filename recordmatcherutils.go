@@ -10,7 +10,6 @@ import (
 )
 
 type getter interface {
-	getRecords(ctx context.Context) ([]*pbrc.Record, error)
 	getRecord(ctx context.Context, id int32) (*pbrc.Record, error)
 	getRecordsWithMaster(ctx context.Context, masterID int32) ([]int32, error)
 	getRecordsWithID(ctx context.Context, id int32) ([]int32, error)

@@ -34,23 +34,6 @@ type prodGetter struct {
 	dial func(server string) (*grpc.ClientConn, error)
 }
 
-func (p prodGetter) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
-	conn, err := p.dial("recordcollection")
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	req := &pbrc.GetRecordsRequest{Caller: "recordmatcher", Filter: &pbrc.Record{}}
-	resp, err := client.GetRecords(ctx, req, grpc.MaxCallRecvMsgSize(1024*1024*1024))
-	if err != nil {
-		return nil, err
-	}
-
-	return resp.GetRecords(), nil
-}
-
 func (p prodGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
 	conn, err := p.dial("recordcollection")
 	if err != nil {
