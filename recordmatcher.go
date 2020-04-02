@@ -193,7 +193,7 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 
-	server.RegisterServer("recordmatcher", false)
+	server.RegisterServerV2("recordmatcher", false, false)
 
 	if *init {
 		ctx, cancel := utils.BuildContext("recordmatcher", "recordmatcher")
