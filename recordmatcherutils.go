@@ -26,13 +26,16 @@ func (s *Server) requiresStockCheck(ctx context.Context, r *pbrc.Record) bool {
 }
 
 func (s *Server) processRecords(ctx context.Context) error {
-	count := 0
 	recs, err := s.getter.getRecordsSince(ctx, s.config.LastRun)
 
 	if err != nil {
 		return err
 	}
 
+	return s.processRecordList(ctx, recs)
+}
+
+func (s *Server) processRecordList(ctx context.Context, recs []int32) error {
 	matches := make(map[int32][]*pbrc.Record)
 	trackNumbers := make(map[int32]int)
 	for _, id := range recs {
@@ -98,7 +101,6 @@ func (s *Server) processRecords(ctx context.Context) error {
 		}
 	}
 
-	s.count = count
 	s.config.LastRun = time.Now().Unix()
 	return nil
 }
