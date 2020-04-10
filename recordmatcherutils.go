@@ -77,6 +77,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32) error {
 				trackNumbers[r.GetRelease().InstanceId]++
 			}
 		}
+
 	}
 
 	for _, records := range matches {
@@ -98,6 +99,12 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32) error {
 			if err != nil {
 				return err
 			}
+		}
+
+		if len(matches) == 1 {
+			//No match found
+			records[0].GetMetadata().Match = pbrc.ReleaseMetadata_NO_MATCH
+			return s.getter.update(ctx, records[0])
 		}
 	}
 
