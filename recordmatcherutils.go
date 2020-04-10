@@ -102,5 +102,8 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32) error {
 	}
 
 	s.config.LastRun = time.Now().Unix()
-	return nil
+
+	//No match found
+	records[0].GetMetadata().Match = pbrc.ReleaseMetadata_NO_MATCH
+	return s.getter.update(ctx, records[0])
 }
