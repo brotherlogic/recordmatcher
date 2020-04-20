@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/brotherlogic/goserver"
+	"github.com/brotherlogic/goserver/utils"
 	"github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
-	"github.com/brotherlogic/goserver/utils"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pb "github.com/brotherlogic/recordmatcher/proto"
 )
@@ -102,7 +103,7 @@ func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, err
 	return resp.GetInstanceIds(), nil
 }
 
-func (p prodGetter) update(ctx context.Context, r *pbrc.Record) error {
+func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState) error {
 	conn, err := p.dial("recordcollection")
 	if err != nil {
 		return err
@@ -110,7 +111,7 @@ func (p prodGetter) update(ctx context.Context, r *pbrc.Record) error {
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	_, err = client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Requestor: "recordmatcher", Update: r})
+	_, err = client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Reason: "recordmatch", Requestor: "recordmatcher", Update: &pbrc.Record{Release: &pbgd.Release{InstanceId: i}, Metadata: &pbrc.ReleaseMetadata{Match: match}}})
 	if err != nil {
 		return err
 	}

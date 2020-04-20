@@ -25,11 +25,11 @@ func (t *testGetter) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	return t.rec, nil
 }
 
-func (t *testGetter) update(ctx context.Context, r *pbrc.Record) error {
+func (t *testGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState) error {
 	if t.updateFail {
 		return fmt.Errorf("Built to fail")
 	}
-	t.lastUpdated = r.GetRelease().Id
+	t.lastUpdated = i
 	return nil
 }
 
@@ -103,7 +103,7 @@ func TestBasicTestWithFail(t *testing.T) {
 
 func TestNeedsStockCheck(t *testing.T) {
 	s := InitTest()
-	tu := &testGetter{rec: []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Id: 123, MasterId: 123}, Metadata: &pbrc.ReleaseMetadata{}}}}
+	tu := &testGetter{rec: []*pbrc.Record{&pbrc.Record{Release: &pbgd.Release{Id: 123, InstanceId: 123, MasterId: 123}, Metadata: &pbrc.ReleaseMetadata{}}}}
 	s.getter = tu
 	err := s.processRecords(context.Background())
 	if err != nil {
