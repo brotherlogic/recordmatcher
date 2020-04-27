@@ -1,3 +1,4 @@
 recordmatcher
 *~
 .testing
+recordmatcher_cli/recordmatcher_cli

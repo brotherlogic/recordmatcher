@@ -103,7 +103,7 @@ func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, err
 	return resp.GetInstanceIds(), nil
 }
 
-func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState) error {
+func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, source string) error {
 	conn, err := p.dial("recordcollection")
 	if err != nil {
 		return err
@@ -111,7 +111,7 @@ func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetad
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	_, err = client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Reason: "recordmatch", Requestor: "recordmatcher", Update: &pbrc.Record{Release: &pbgd.Release{InstanceId: i}, Metadata: &pbrc.ReleaseMetadata{Match: match}}})
+	_, err = client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Reason: "recordmatch", Requestor: "recordmatcher-" + source, Update: &pbrc.Record{Release: &pbgd.Release{InstanceId: i}, Metadata: &pbrc.ReleaseMetadata{Match: match}}})
 	if err != nil {
 		return err
 	}

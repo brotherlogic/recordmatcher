@@ -25,7 +25,7 @@ func (t *testGetter) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	return t.rec, nil
 }
 
-func (t *testGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState) error {
+func (t *testGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, source string) error {
 	if t.updateFail {
 		return fmt.Errorf("Built to fail")
 	}
