@@ -103,7 +103,10 @@ func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, err
 	return resp.GetInstanceIds(), nil
 }
 
-func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, source string) error {
+func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, existing pbrc.ReleaseMetadata_MatchState, source string) error {
+	if match == existing {
+		return nil
+	}
 	conn, err := p.dial("recordcollection")
 	if err != nil {
 		return err
