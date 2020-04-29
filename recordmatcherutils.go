@@ -14,7 +14,7 @@ type getter interface {
 	getRecordsWithMaster(ctx context.Context, masterID int32) ([]int32, error)
 	getRecordsWithID(ctx context.Context, id int32) ([]int32, error)
 	getRecordsSince(ctx context.Context, t int64) ([]int32, error)
-	update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, source string) error
+	update(ctx context.Context, i int32, match, existing pbrc.ReleaseMetadata_MatchState, source string) error
 }
 
 func (s *Server) requiresStockCheck(ctx context.Context, r *pbrc.Record) bool {
@@ -85,7 +85,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			if trackNumbers[records[0].GetRelease().InstanceId] == trackNumbers[records[1].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
 					records[0].GetMetadata().Match = pbrc.ReleaseMetadata_FULL_MATCH
-					err := s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, source)
+					err := s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, records[0].GetMetadata().GetMatch(), source)
 					if err != nil {
 						return err
 					}
@@ -95,7 +95,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 		if len(records) == 1 && !records[0].GetMetadata().NeedsStockCheck && time.Now().Sub(time.Unix(records[0].GetMetadata().LastStockCheck, 0)) > time.Hour*24*30*6 && records[0].GetMetadata().Keep != pbrc.ReleaseMetadata_KEEPER && s.requiresStockCheck(ctx, records[0]) {
 			records[0].GetMetadata().NeedsStockCheck = true
-			err := s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_MATCH_UNKNOWN, source)
+			err := s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_MATCH_UNKNOWN, records[0].GetMetadata().GetMatch(), source)
 			if err != nil {
 				return err
 			}
@@ -104,7 +104,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		if len(matches) == 1 {
 			//No match found
 			records[0].GetMetadata().Match = pbrc.ReleaseMetadata_NO_MATCH
-			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, source)
+			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 		}
 	}
 
