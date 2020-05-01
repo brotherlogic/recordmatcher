@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"golang.org/x/net/context"
@@ -85,20 +86,14 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			if trackNumbers[records[0].GetRelease().InstanceId] == trackNumbers[records[1].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
 					records[0].GetMetadata().Match = pbrc.ReleaseMetadata_FULL_MATCH
-					err := s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, records[0].GetMetadata().GetMatch(), source)
-					if err != nil {
-						return err
-					}
+					return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, records[0].GetMetadata().GetMatch(), source)
 				}
 			}
 		}
 
 		if len(records) == 1 && !records[0].GetMetadata().NeedsStockCheck && time.Now().Sub(time.Unix(records[0].GetMetadata().LastStockCheck, 0)) > time.Hour*24*30*6 && records[0].GetMetadata().Keep != pbrc.ReleaseMetadata_KEEPER && s.requiresStockCheck(ctx, records[0]) {
 			records[0].GetMetadata().NeedsStockCheck = true
-			err := s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_MATCH_UNKNOWN, records[0].GetMetadata().GetMatch(), source)
-			if err != nil {
-				return err
-			}
+			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_MATCH_UNKNOWN, records[0].GetMetadata().GetMatch(), source)
 		}
 
 		if len(matches) == 1 {
@@ -109,5 +104,5 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	}
 
 	s.config.LastRun = time.Now().Unix()
-	return nil
+	return fmt.Errorf("No match state appropriate: %v", len(matches))
 }
