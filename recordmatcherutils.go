@@ -85,7 +85,6 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		if len(records) == 2 {
 			if trackNumbers[records[0].GetRelease().InstanceId] == trackNumbers[records[1].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
-					records[0].GetMetadata().Match = pbrc.ReleaseMetadata_FULL_MATCH
 					return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, records[0].GetMetadata().GetMatch(), source)
 				}
 			}
@@ -98,7 +97,6 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 		if len(matches) == 1 {
 			//No match found
-			records[0].GetMetadata().Match = pbrc.ReleaseMetadata_NO_MATCH
 			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 		}
 	}
