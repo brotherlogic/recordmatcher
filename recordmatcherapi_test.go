@@ -1,10 +1,10 @@
 package main
 
 import (
+	"context"
 	"testing"
 
 	pb "github.com/brotherlogic/recordmatcher/proto"
-	"golang.org/x/net/context"
 )
 
 func TestBasicAPI(t *testing.T) {
