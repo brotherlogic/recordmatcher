@@ -10,6 +10,7 @@ import (
 	"github.com/brotherlogic/goserver"
 	"github.com/brotherlogic/goserver/utils"
 	"github.com/brotherlogic/keystore/client"
+	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -183,6 +184,7 @@ func (s *Server) GetState() []*pbg.State {
 		&pbg.State{Key: "processed_records", Value: int64(len(s.config.ProcessedRecords))},
 		&pbg.State{Key: "found_records", Value: int64(s.count)},
 		&pbg.State{Key: "last_run", TimeValue: s.config.LastRun},
+		&pbg.State{Key: "size", Value: int64(proto.Size(s.config))},
 	}
 }
 
