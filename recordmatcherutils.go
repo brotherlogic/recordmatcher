@@ -81,7 +81,9 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 	}
 
-	for _, records := range matches {
+	lens := ""
+	for i, records := range matches {
+		lens += fmt.Sprintf("%v: %v", i, len(records))
 		if len(records) == 2 {
 			if trackNumbers[records[0].GetRelease().InstanceId] == trackNumbers[records[1].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
@@ -102,5 +104,5 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	}
 
 	s.config.LastRun = time.Now().Unix()
-	return fmt.Errorf("No match state appropriate for %v: %v", recs, len(matches))
+	return fmt.Errorf("No match state appropriate for %v: %v", recs, lens)
 }
