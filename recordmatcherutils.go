@@ -102,5 +102,5 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	}
 
 	s.config.LastRun = time.Now().Unix()
-	return fmt.Errorf("No match state appropriate: %v", len(matches))
+	return fmt.Errorf("No match state appropriate for %v: %v", recs, len(matches))
 }
