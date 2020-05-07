@@ -83,7 +83,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 	lens := ""
 	for i, records := range matches {
-		lens += fmt.Sprintf("%v: %v", i, len(records))
+		lens += fmt.Sprintf(" %v->%v ", i, len(records))
 		if len(records) == 2 {
 			if trackNumbers[records[0].GetRelease().InstanceId] == trackNumbers[records[1].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
