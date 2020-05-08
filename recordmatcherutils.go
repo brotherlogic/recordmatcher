@@ -97,7 +97,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_MATCH_UNKNOWN, records[0].GetMetadata().GetMatch(), source)
 		}
 
-		if len(matches) == 1 {
+		if len(records) == 1 {
 			//No match found
 			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 		}
