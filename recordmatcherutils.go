@@ -71,14 +71,17 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			}
 
 		}
+	}
 
-		trackNumbers[r.GetRelease().InstanceId] = 0
-		for _, track := range r.GetRelease().Tracklist {
-			if track.TrackType == pbgd.Track_TRACK {
-				trackNumbers[r.GetRelease().InstanceId]++
+	for _, recs := range matches {
+		for _, r := range recs {
+			trackNumbers[r.GetRelease().InstanceId] = 0
+			for _, track := range r.GetRelease().Tracklist {
+				if track.TrackType == pbgd.Track_TRACK {
+					trackNumbers[r.GetRelease().InstanceId]++
+				}
 			}
 		}
-
 	}
 
 	lens := ""
