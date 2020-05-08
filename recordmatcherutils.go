@@ -99,6 +99,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 		if len(records) == 1 {
 			//No match found
+			s.Log(fmt.Sprintf("FOUND NO MATCH %v -> %v", recs, lens))
 			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 		}
 	}
