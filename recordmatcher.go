@@ -63,7 +63,7 @@ func (p prodGetter) getRecordsSince(ctx context.Context, t int64) ([]int32, erro
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	req := &pbrc.QueryRecordsRequest{Query: &pbrc.QueryRecordsRequest_UpdateTime{t}}
+	req := &pbrc.QueryRecordsRequest{Origin: "recordmatcher-since", Query: &pbrc.QueryRecordsRequest_UpdateTime{t}}
 	resp, err := client.QueryRecords(ctx, req)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (p prodGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32,
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	req := &pbrc.QueryRecordsRequest{Query: &pbrc.QueryRecordsRequest_MasterId{m}}
+	req := &pbrc.QueryRecordsRequest{Origin: "recordmatcher-master", Query: &pbrc.QueryRecordsRequest_MasterId{m}}
 	resp, err := client.QueryRecords(ctx, req)
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, err
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	req := &pbrc.QueryRecordsRequest{Query: &pbrc.QueryRecordsRequest_ReleaseId{i}}
+	req := &pbrc.QueryRecordsRequest{Origin: "recordmatcher-withid", Query: &pbrc.QueryRecordsRequest_ReleaseId{i}}
 	resp, err := client.QueryRecords(ctx, req)
 	if err != nil {
 		return nil, err
