@@ -46,6 +46,13 @@ func (t *testGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Rec
 	if t.failNum == instanceID && t.failNum != 0 {
 		return nil, fmt.Errorf("FAIL")
 	}
+
+	for _, rec := range t.rec {
+		if rec.GetRelease().GetInstanceId() == instanceID {
+			return rec, nil
+		}
+	}
+
 	return t.rec[0], nil
 }
 
@@ -124,6 +131,19 @@ func TestVeryBasicTestTrackMatch(t *testing.T) {
 		t.Errorf("Failed: %v", err)
 	}
 }
+func TestVeryBasicTestTrackMatchWithTwo(t *testing.T) {
+	s := InitTest()
+	s.getter = &testGetter{rec: []*pbrc.Record{
+		&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{InstanceId: 15, MasterId: 123, Tracklist: []*pbgd.Track{&pbgd.Track{Title: "Test", TrackType: pbgd.Track_TRACK}}}},
+		&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{InstanceId: 11, MasterId: 123, FolderId: 242017, Tracklist: []*pbgd.Track{&pbgd.Track{Title: "Test", TrackType: pbgd.Track_TRACK}}}},
+		&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{InstanceId: 12, MasterId: 123, FolderId: 242017}},
+	}}
+	err := s.processRecords(context.Background())
+	if err != nil {
+		t.Errorf("Failed: %v", err)
+	}
+}
+
 func TestVeryBasicTestTrackMatchNoMatch(t *testing.T) {
 	s := InitTest()
 	s.getter = &testGetter{noMatch: true, rec: []*pbrc.Record{

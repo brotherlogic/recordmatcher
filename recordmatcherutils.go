@@ -87,20 +87,22 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	lens := ""
 	for i, records := range matches {
 		lens += fmt.Sprintf(" %v->%v ", i, len(records))
-		if len(records) == 2 {
-			lens += fmt.Sprintf(" adding %v and %v from %v", trackNumbers[records[0].GetRelease().InstanceId], trackNumbers[records[1].GetRelease().InstanceId], trackNumbers)
-			if trackNumbers[records[0].GetRelease().InstanceId] <= trackNumbers[records[1].GetRelease().InstanceId] {
+		for i := 1; i < len(records); i++ {
+			lens += fmt.Sprintf(" adding %v and %v from %v", trackNumbers[records[0].GetRelease().InstanceId], trackNumbers[records[i].GetRelease().InstanceId], trackNumbers)
+			if trackNumbers[records[0].GetRelease().InstanceId] <= trackNumbers[records[i].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
 					return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, records[0].GetMetadata().GetMatch(), source)
-				}
-			} else {
-				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_NO_MATCH {
-					return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 				}
 			}
 		}
 
-		if len(records) == 1 && !records[0].GetMetadata().NeedsStockCheck && time.Now().Sub(time.Unix(records[0].GetMetadata().LastStockCheck, 0)) > time.Hour*24*30*6 && records[0].GetMetadata().Keep != pbrc.ReleaseMetadata_KEEPER && s.requiresStockCheck(ctx, records[0]) {
+		if len(records) >= 2 {
+			if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_NO_MATCH {
+				return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
+			}
+		}
+
+		if len(records) == 1 && records[0].GetMetadata() != nil && !records[0].GetMetadata().GetNeedsStockCheck() && time.Now().Sub(time.Unix(records[0].GetMetadata().GetLastStockCheck(), 0)) > time.Hour*24*30*6 && records[0].GetMetadata().GetKeep() != pbrc.ReleaseMetadata_KEEPER && s.requiresStockCheck(ctx, records[0]) {
 			s.Log(fmt.Sprintf("%v needs stock check: %v", records[0].GetRelease().GetInstanceId(), time.Unix(records[0].GetMetadata().GetLastStockCheck(), 0)))
 			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_MATCH_UNKNOWN, records[0].GetMetadata().GetMatch(), source)
 		}
@@ -108,7 +110,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		if len(records) == 1 {
 			//No match found
 			s.Log(fmt.Sprintf("FOUND NO MATCH %v -> %v", recs, lens))
-			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
+			return s.getter.update(ctx, records[0].GetRelease().GetInstanceId(), pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 		}
 	}
 
