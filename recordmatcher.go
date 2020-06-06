@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"time"
 
 	"github.com/brotherlogic/goserver"
-	"github.com/brotherlogic/goserver/utils"
 	"github.com/brotherlogic/keystore/client"
-	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -29,8 +26,6 @@ const (
 type Server struct {
 	*goserver.GoServer
 	getter getter
-	config *pb.Config
-	count  int
 }
 
 type prodGetter struct {
@@ -129,7 +124,6 @@ func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetad
 func Init() *Server {
 	s := &Server{
 		GoServer: &goserver.GoServer{},
-		config:   &pb.Config{},
 	}
 	s.getter = &prodGetter{dial: s.DialMaster, log: s.Log}
 	s.GoServer.KSclient = *keystoreclient.GetClient(s.DialMaster)
@@ -146,50 +140,23 @@ func (s *Server) ReportHealth() bool {
 	return true
 }
 
-func (s *Server) saveConfig(ctx context.Context) {
-	s.KSclient.Save(ctx, KEY, s.config)
-}
-
-func (s *Server) readConfig(ctx context.Context) error {
-	config := &pb.Config{}
-	data, _, err := s.KSclient.Read(ctx, KEY, config)
-
-	if err != nil {
-		return err
-	}
-
-	s.config = data.(*pb.Config)
-	return nil
-}
-
 // Shutdown the server
 func (s *Server) Shutdown(ctx context.Context) error {
-	s.saveConfig(ctx)
 	return nil
 }
 
 // Mote promotes/demotes this server
 func (s *Server) Mote(ctx context.Context, master bool) error {
-	if master {
-		err := s.readConfig(ctx)
-		return err
-	}
-
 	return nil
 }
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{
-		&pbg.State{Key: "processed_records", Value: int64(len(s.config.ProcessedRecords))},
-		&pbg.State{Key: "found_records", Value: int64(s.count)},
-		&pbg.State{Key: "size", Value: int64(proto.Size(s.config))},
-	}
+	return []*pbg.State{}
 }
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
-	var init = flag.Bool("init", false, "Init the system")
 	flag.Parse()
 
 	//Turn off logging
@@ -201,19 +168,10 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 
-	err := server.RegisterServerV2("recordmatcher", false, false)
+	err := server.RegisterServerV2("recordmatcher", false, true)
 	if err != nil {
 		return
 	}
 
-	if *init {
-		ctx, cancel := utils.BuildContext("recordmatcher", "recordmatcher")
-		defer cancel()
-		server.config.TotalProcessed++
-		server.saveConfig(ctx)
-		return
-	}
-
-	server.RegisterRepeatingTask(server.processRecords, "process_records", time.Hour)
 	server.Serve()
 }
