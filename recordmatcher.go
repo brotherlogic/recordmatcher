@@ -7,13 +7,13 @@ import (
 	"log"
 
 	"github.com/brotherlogic/goserver"
-	"github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pb "github.com/brotherlogic/recordmatcher/proto"
 )
 
@@ -29,12 +29,12 @@ type Server struct {
 }
 
 type prodGetter struct {
-	dial func(server string) (*grpc.ClientConn, error)
+	dial func(ctx context.Context, server string) (*grpc.ClientConn, error)
 	log  func(log string)
 }
 
 func (p prodGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
-	conn, err := p.dial("recordcollection")
+	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (p prodGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Reco
 }
 
 func (p prodGetter) getRecordsSince(ctx context.Context, t int64) ([]int32, error) {
-	conn, err := p.dial("recordcollection")
+	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (p prodGetter) getRecordsSince(ctx context.Context, t int64) ([]int32, erro
 }
 
 func (p prodGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32, error) {
-	conn, err := p.dial("recordcollection")
+	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (p prodGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32,
 }
 
 func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, error) {
-	conn, err := p.dial("recordcollection")
+	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetad
 	if match == existing {
 		return nil
 	}
-	conn, err := p.dial("recordcollection")
+	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return err
 	}
@@ -125,14 +125,14 @@ func Init() *Server {
 	s := &Server{
 		GoServer: &goserver.GoServer{},
 	}
-	s.getter = &prodGetter{dial: s.DialMaster, log: s.Log}
-	s.GoServer.KSclient = *keystoreclient.GetClient(s.DialMaster)
+	s.getter = &prodGetter{dial: s.FDialServer, log: s.Log}
 	return s
 }
 
 // DoRegister does RPC registration
 func (s *Server) DoRegister(server *grpc.Server) {
 	pb.RegisterRecordMatcherServiceServer(server, s)
+	rcpb.RegisterClientUpdateServiceServer(server, s)
 }
 
 // ReportHealth alerts if we're not healthy
