@@ -106,7 +106,8 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 		if len(records) == 1 && records[0].GetMetadata() != nil && !records[0].GetMetadata().GetNeedsStockCheck() && time.Now().Sub(time.Unix(records[0].GetMetadata().GetLastStockCheck(), 0)) > time.Hour*24*30*6 && records[0].GetMetadata().GetKeep() != pbrc.ReleaseMetadata_KEEPER && s.requiresStockCheck(ctx, records[0]) {
 			s.Log(fmt.Sprintf("%v needs stock check: %v", records[0].GetRelease().GetInstanceId(), time.Unix(records[0].GetMetadata().GetLastStockCheck(), 0)))
-			return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_MATCH_UNKNOWN, records[0].GetMetadata().GetMatch(), source)
+			s.RaiseIssue(fmt.Sprintf("%v needs stock check", records[0].GetRelease().GetInstanceId()), "Yes it does")
+			return nil
 		}
 
 		if len(records) == 1 {
