@@ -7,29 +7,24 @@ import (
 	"os"
 
 	"github.com/brotherlogic/goserver/utils"
-	"google.golang.org/grpc"
 
 	pb "github.com/brotherlogic/recordmatcher/proto"
 
 	//Needed to pull in gzip encoding init
 	_ "google.golang.org/grpc/encoding/gzip"
-	"google.golang.org/grpc/resolver"
 )
 
-func init() {
-	resolver.Register(&utils.DiscoveryClientResolverBuilder{})
-}
-
 func main() {
-	conn, err := grpc.Dial("discovery:///recordmatcher", grpc.WithInsecure(), grpc.WithBalancerName("my_pick_first"))
+	ctx, cancel := utils.BuildContext("recordmatcher-cli", "recordmatcher")
+	defer cancel()
+
+	conn, err := utils.LFDialServer(ctx, "recordmatcher")
 	if err != nil {
 		log.Fatalf("Unable to dial: %v", err)
 	}
 	defer conn.Close()
 
 	client := pb.NewRecordMatcherServiceClient(conn)
-	ctx, cancel := utils.BuildContext("recordmatcher-cli", "recordmatcher")
-	defer cancel()
 
 	switch os.Args[1] {
 	case "match":
