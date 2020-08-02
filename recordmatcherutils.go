@@ -50,6 +50,11 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			if err != nil {
 				return err
 			}
+
+			if len(mrecs) == 0 {
+				s.Log(fmt.Sprintf("Could not find any master ids for %v", r.GetRelease().GetInstanceId()))
+			}
+
 			for _, mrec := range mrecs {
 				r, err = s.getter.getRecord(ctx, mrec)
 				if err != nil {
