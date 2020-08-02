@@ -102,6 +102,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_NO_MATCH {
 				return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 			}
+			return nil
 		}
 
 		if len(records) == 1 && records[0].GetMetadata() != nil && !records[0].GetMetadata().GetNeedsStockCheck() && time.Now().Sub(time.Unix(records[0].GetMetadata().GetLastStockCheck(), 0)) > time.Hour*24*30*6 && records[0].GetMetadata().GetKeep() != pbrc.ReleaseMetadata_KEEPER && s.requiresStockCheck(ctx, records[0]) {
