@@ -41,8 +41,14 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	trackNumbers := make(map[int32]int)
 	for _, id := range recs {
 		r, err := s.getter.getRecord(ctx, id)
+
 		if err != nil {
 			return err
+		}
+
+		//Don't match if this isn't in the listening pile
+		if r.GetRelease().GetFolderId() != 812802 && len(recs) == 1 {
+			return nil
 		}
 
 		if r.GetRelease().MasterId > 0 {
