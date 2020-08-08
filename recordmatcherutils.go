@@ -23,6 +23,10 @@ func (s *Server) requiresStockCheck(ctx context.Context, r *pbrc.Record) bool {
 		return false
 	}
 
+	if r.GetMetadata().GetGoalFolder() == 268147 {
+		return false
+	}
+
 	return true
 }
 
