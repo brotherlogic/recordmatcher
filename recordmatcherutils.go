@@ -50,11 +50,6 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			return err
 		}
 
-		//Don't match if this isn't in the listening pile
-		if r.GetRelease().GetFolderId() != 812802 && len(recs) == 1 {
-			return nil
-		}
-
 		if r.GetRelease().MasterId > 0 {
 			mrecs, err := s.getter.getRecordsWithMaster(ctx, r.GetRelease().MasterId)
 			if err != nil {
