@@ -94,7 +94,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		}
 	}
 
-	lens := ""
+	lens := fmt.Sprintf("%v:", len(matches))
 	for i, records := range matches {
 		lens += fmt.Sprintf(" %v->%v ", i, len(records))
 
