@@ -43,6 +43,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 func (s *Server) processRecordList(ctx context.Context, recs []int32, source string) error {
 	matches := make(map[int32][]*pbrc.Record)
 	trackNumbers := make(map[int32]int)
+	ll := ""
 	for _, id := range recs {
 		r, err := s.getter.getRecord(ctx, id)
 
@@ -56,6 +57,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				return err
 			}
 
+			ll = fmt.Sprintf("MID,%v", len(mrecs))
 			if len(mrecs) == 0 {
 				s.Log(fmt.Sprintf("Could not find any master ids for %v", r.GetRelease().GetInstanceId()))
 			}
@@ -72,6 +74,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			if err != nil {
 				return err
 			}
+			ll = fmt.Sprintf("WID,%v", len(mrecs))
 			for _, mrec := range mrecs {
 				r, err = s.getter.getRecord(ctx, mrec)
 				if err != nil {
@@ -94,7 +97,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		}
 	}
 
-	lens := fmt.Sprintf("%v:", len(matches))
+	lens := fmt.Sprintf("%v:%v:", len(matches), ll)
 	for i, records := range matches {
 		lens += fmt.Sprintf(" %v->%v ", i, len(records))
 
