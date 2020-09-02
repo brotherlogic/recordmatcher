@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"golang.org/x/net/context"
 
@@ -16,18 +15,6 @@ type getter interface {
 	getRecordsWithID(ctx context.Context, id int32) ([]int32, error)
 	getRecordsSince(ctx context.Context, t int64) ([]int32, error)
 	update(ctx context.Context, i int32, match, existing pbrc.ReleaseMetadata_MatchState, source string) error
-}
-
-func (s *Server) requiresStockCheck(ctx context.Context, r *pbrc.Record) bool {
-	if len(r.GetMetadata().CdPath) > 0 {
-		return false
-	}
-
-	if r.GetMetadata().GetGoalFolder() == 268147 {
-		return false
-	}
-
-	return true
 }
 
 func (s *Server) processRecords(ctx context.Context) error {
@@ -115,12 +102,6 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_NO_MATCH {
 				return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 			}
-			return nil
-		}
-
-		if len(records) == 1 && records[0].GetMetadata() != nil && !records[0].GetMetadata().GetNeedsStockCheck() && time.Now().Sub(time.Unix(records[0].GetMetadata().GetLastStockCheck(), 0)) > time.Hour*24*30*6 && records[0].GetMetadata().GetKeep() != pbrc.ReleaseMetadata_KEEPER && s.requiresStockCheck(ctx, records[0]) {
-			s.Log(fmt.Sprintf("%v needs stock check: %v", records[0].GetRelease().GetInstanceId(), time.Unix(records[0].GetMetadata().GetLastStockCheck(), 0)))
-			s.RaiseIssue(fmt.Sprintf("%v needs stock check", records[0].GetRelease().GetInstanceId()), "Yes it does")
 			return nil
 		}
 
