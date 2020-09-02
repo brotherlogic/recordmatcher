@@ -104,13 +104,6 @@ func InitTest() *Server {
 	return s
 }
 
-func TestFailStock(t *testing.T) {
-	s := InitTest()
-	if s.requiresStockCheck(context.Background(), &pbrc.Record{Metadata: &pbrc.ReleaseMetadata{CdPath: "blah"}}) {
-		t.Errorf("Ripped record needed stock check")
-	}
-}
-
 func TestVeryBasicTest(t *testing.T) {
 	s := InitTest()
 	err := s.processRecords(context.Background())
