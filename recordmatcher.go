@@ -41,7 +41,8 @@ func (p prodGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Reco
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	req := &pbrc.GetRecordRequest{InstanceId: instanceID}
+	// Validate this record so that we at least get the right cache details
+	req := &pbrc.GetRecordRequest{InstanceId: instanceID, Validate: true}
 	resp, err := client.GetRecord(ctx, req)
 	if err != nil {
 		return nil, err

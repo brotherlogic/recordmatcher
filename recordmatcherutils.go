@@ -62,6 +62,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				return err
 			}
 			ll = fmt.Sprintf("WID,%v", len(mrecs))
+
 			for _, mrec := range mrecs {
 				r, err = s.getter.getRecord(ctx, mrec)
 				if err != nil {
