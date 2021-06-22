@@ -53,6 +53,10 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 			for _, mrec := range mrecs {
 				r, err = s.getter.getRecord(ctx, mrec)
+				// This is a deleted record
+				if status.Convert(err).Code() == codes.OutOfRange {
+					continue
+				}
 				if err != nil {
 					return err
 				}
