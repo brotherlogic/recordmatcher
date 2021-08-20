@@ -9,6 +9,8 @@ import (
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
@@ -116,7 +118,9 @@ func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetad
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	_, err = client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Reason: "recordmatch", Requestor: "recordmatcher-" + source, Update: &pbrc.Record{Release: &pbgd.Release{InstanceId: i}, Metadata: &pbrc.ReleaseMetadata{Match: match}}})
 	if err != nil {
-		return err
+		if status.Convert(err).Code() != codes.FailedPrecondition {
+			return err
+		}
 	}
 	return nil
 }
