@@ -37,6 +37,9 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		r, err := s.getter.getRecord(ctx, id)
 
 		if err != nil {
+			if status.Convert(err).Code() == codes.OutOfRange {
+				return nil
+			}
 			return err
 		}
 
