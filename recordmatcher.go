@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"time"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
@@ -27,7 +28,8 @@ const (
 //Server main server type
 type Server struct {
 	*goserver.GoServer
-	getter getter
+	getter  getter
+	lastMap map[int32]time.Time
 }
 
 type prodGetter struct {

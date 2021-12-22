@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
@@ -30,6 +31,15 @@ func (s *Server) processRecords(ctx context.Context) error {
 }
 
 func (s *Server) processRecordList(ctx context.Context, recs []int32, source string) error {
+	for _, r := range recs {
+		val, ok := s.lastMap[r]
+		if ok && time.Since(val) < time.Hour*24 {
+			return nil
+		}
+	}
+	for _, r := range recs {
+		s.lastMap[r] = time.Now()
+	}
 	matches := make(map[int32][]*pbrc.Record)
 	trackNumbers := make(map[int32]int)
 	ll := ""
