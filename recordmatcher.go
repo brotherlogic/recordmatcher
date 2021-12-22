@@ -131,6 +131,7 @@ func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetad
 func Init() *Server {
 	s := &Server{
 		GoServer: &goserver.GoServer{},
+		lastMap:  make(map[int32]time.Time),
 	}
 	s.getter = &prodGetter{dial: s.FDialServer, log: s.Log}
 	return s
