@@ -3,16 +3,13 @@ module github.com/brotherlogic/recordmatcher
 go 1.16
 
 require (
-	github.com/brotherlogic/dstore v0.0.0-20211129160138-88023844d0bb // indirect
+	github.com/brotherlogic/gobuildslave v0.0.0-20211223230201-6811d04009d2 // indirect
 	github.com/brotherlogic/godiscogs v0.0.0-20210915003628-cc86b65540a1
-	github.com/brotherlogic/goserver v0.0.0-20211220171135-4f19e11c9a73
+	github.com/brotherlogic/goserver v0.0.0-20220102180024-a20992343980
 	github.com/brotherlogic/keystore v0.0.0-20201029130503-da423c07fd79
-	github.com/brotherlogic/lock v0.0.0-20211209023923-5c75d6047964 // indirect
-	github.com/brotherlogic/recordcollection v0.0.0-20211221225035-3f7fc46e2315
+	github.com/brotherlogic/recordcollection v0.0.0-20220102173831-ac8389294a1d
 	github.com/golang/protobuf v1.5.2
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
-	google.golang.org/genproto v0.0.0-20211222154725-9823f7ba7562 // indirect
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.27.1
 )
