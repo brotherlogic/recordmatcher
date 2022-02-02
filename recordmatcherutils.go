@@ -47,6 +47,12 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	for _, id := range recs {
 		r, err := s.getter.getRecord(ctx, id)
 
+		// We don't try and match a sold record
+		if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_STAGED_TO_SELL ||
+			r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_SOLD_ARCHIVE {
+			return nil
+		}
+
 		if err != nil {
 			if status.Convert(err).Code() == codes.OutOfRange {
 				return nil
@@ -74,7 +80,11 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				if err != nil {
 					return err
 				}
-				matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+
+				if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_STAGED_TO_SELL &&
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE {
+					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+				}
 			}
 		} else {
 			mrecs, err := s.getter.getRecordsWithID(ctx, r.GetRelease().Id)
@@ -92,7 +102,10 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				if err != nil {
 					return err
 				}
-				matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+				if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_STAGED_TO_SELL &&
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE {
+					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+				}
 			}
 
 		}
