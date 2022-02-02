@@ -34,7 +34,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	for _, r := range recs {
 		val, ok := s.lastMap[r]
 		if ok && time.Since(val) < time.Hour*24 {
-			s.Log(fmt.Sprintf("Skipping match as we have done this recently: %v", val))
+			s.Log(fmt.Sprintf("Skipping match of %v as we have done this recently: %v", recs, val))
 			return nil
 		}
 	}
