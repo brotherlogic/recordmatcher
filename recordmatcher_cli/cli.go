@@ -32,7 +32,7 @@ func main() {
 		var id = addFlags.Int("id", -1, "Id of the record to add")
 
 		if err := addFlags.Parse(os.Args[2:]); err == nil {
-			_, err := client.Match(ctx, &pb.MatchRequest{InstanceId: int32(*id)})
+			_, err := client.Match(ctx, &pb.MatchRequest{Force: true, InstanceId: int32(*id)})
 			if err != nil {
 				log.Fatalf("Error on Add Record: %v", err)
 			}
