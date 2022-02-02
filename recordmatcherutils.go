@@ -111,6 +111,8 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		}
 	}
 
+	s.CtxLog(ctx, fmt.Sprintf("MATCH for %v -> %v", recs, matches))
+
 	for _, recs := range matches {
 		for _, r := range recs {
 			trackNumbers[r.GetRelease().InstanceId] = 0
