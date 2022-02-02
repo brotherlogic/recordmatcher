@@ -13,6 +13,7 @@ message Config {
 
 message MatchRequest {
   int32 instance_id = 1;
+  bool force = 2;
 }
 
 message MatchResponse {}

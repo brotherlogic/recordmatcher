@@ -27,10 +27,10 @@ func (s *Server) processRecords(ctx context.Context) error {
 		return err
 	}
 
-	return s.processRecordList(ctx, recs, "repeat")
+	return s.processRecordList(ctx, recs, "repeat", false)
 }
 
-func (s *Server) processRecordList(ctx context.Context, recs []int32, source string) error {
+func (s *Server) processRecordList(ctx context.Context, recs []int32, source string, force bool) error {
 	for _, r := range recs {
 		val, ok := s.lastMap[r]
 		if ok && time.Since(val) < time.Hour*24 {
@@ -50,7 +50,9 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		// We don't try and match a sold record
 		if r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_STAGED_TO_SELL ||
 			r.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_SOLD_ARCHIVE {
-			return nil
+			if !force {
+				return nil
+			}
 		}
 
 		if err != nil {
