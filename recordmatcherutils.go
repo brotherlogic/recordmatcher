@@ -113,7 +113,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		}
 	}
 
-	s.CtxLog(ctx, fmt.Sprintf("MATCH for %v -> %v", recs, matches))
+	s.CtxLog(ctx, fmt.Sprintf("MATCH for %v -> %v", recs, ll))
 
 	for _, recs := range matches {
 		for _, r := range recs {
