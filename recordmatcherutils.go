@@ -128,20 +128,16 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 	lens := fmt.Sprintf("%v:%v:", len(matches), ll)
 	for i, records := range matches {
-		lens += fmt.Sprintf(" %v->%v ", i, len(records))
+		s.CtxLog(ctx, fmt.Sprintf(" %v->%v ", i, len(records)))
 
-		proc := false
 		for i := 1; i < len(records); i++ {
-			lens += fmt.Sprintf(" adding %v and %v from %v", trackNumbers[records[0].GetRelease().InstanceId], trackNumbers[records[i].GetRelease().InstanceId], trackNumbers)
+			s.CtxLog(ctx, fmt.Sprintf(" adding %v and %v from %v", trackNumbers[records[0].GetRelease().InstanceId], trackNumbers[records[i].GetRelease().InstanceId], trackNumbers))
 			if trackNumbers[records[0].GetRelease().InstanceId] <= trackNumbers[records[i].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
 					return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, records[0].GetMetadata().GetMatch(), source)
 				}
-				proc = true
+				return nil
 			}
-		}
-		if proc {
-			return nil
 		}
 
 		if len(records) >= 2 {
