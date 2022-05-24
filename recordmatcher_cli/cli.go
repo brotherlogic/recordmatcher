@@ -8,10 +8,8 @@ import (
 
 	"github.com/brotherlogic/goserver/utils"
 
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pb "github.com/brotherlogic/recordmatcher/proto"
-
-	//Needed to pull in gzip encoding init
-	_ "google.golang.org/grpc/encoding/gzip"
 )
 
 func main() {
@@ -37,6 +35,27 @@ func main() {
 				log.Fatalf("Error on Add Record: %v", err)
 			}
 			fmt.Printf("Match processed\n")
+		}
+
+	case "fullping":
+		conn2, err2 := utils.LFDialServer(ctx, "recordcollection")
+		if err2 != nil {
+			log.Fatalf("Can't dial RC: %v", err2)
+		}
+		rcclient := rcpb.NewRecordCollectionServiceClient(conn2)
+		ids, err := rcclient.QueryRecords(ctx, &rcpb.QueryRecordsRequest{Query: &rcpb.QueryRecordsRequest_FolderId{242017}})
+		if err != nil {
+			log.Fatalf("Err: %v", err)
+		}
+
+		sclient := rcpb.NewClientUpdateServiceClient(conn)
+
+		for i, id := range ids.GetInstanceIds() {
+			log.Printf("Pinging: %v / %v", i, len(ids.GetInstanceIds()))
+			_, err = sclient.ClientUpdate(ctx, &rcpb.ClientUpdateRequest{InstanceId: int32(id)})
+			if err != nil {
+				log.Fatalf("Error on GET: %v", err)
+			}
 		}
 	}
 }
