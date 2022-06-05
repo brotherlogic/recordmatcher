@@ -84,7 +84,10 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				}
 
 				if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_STAGED_TO_SELL &&
-					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE {
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE &&
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNKNOWN &&
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_ARRIVED &&
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNLISTENED {
 					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
 				}
 			}
@@ -105,7 +108,10 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 					return err
 				}
 				if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_STAGED_TO_SELL &&
-					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE {
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE &&
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNKNOWN &&
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_ARRIVED &&
+					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNLISTENED {
 					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
 				}
 			}
