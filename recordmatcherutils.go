@@ -73,8 +73,11 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				s.Log(fmt.Sprintf("Could not find any master ids for %v", r.GetRelease().GetInstanceId()))
 			}
 
+			//Ensure we at least have one
+			matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
+
 			for _, mrec := range mrecs {
-				r, err = s.getter.getRecord(ctx, mrec)
+				rin, err := s.getter.getRecord(ctx, mrec)
 				// This is a deleted record
 				if status.Convert(err).Code() == codes.OutOfRange {
 					continue
@@ -83,12 +86,12 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 					return err
 				}
 
-				if r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_STAGED_TO_SELL &&
-					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE &&
-					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNKNOWN &&
-					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_ARRIVED &&
-					r.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNLISTENED {
-					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
+				if rin.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_STAGED_TO_SELL &&
+					rin.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_SOLD_ARCHIVE &&
+					rin.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNKNOWN &&
+					rin.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_ARRIVED &&
+					rin.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNLISTENED {
+					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], rin)
 				}
 			}
 		} else {
