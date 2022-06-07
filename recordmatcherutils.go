@@ -101,6 +101,9 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			}
 			ll = fmt.Sprintf("WID,%v", len(mrecs))
 
+			//Ensure we at least have one
+			matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
+
 			for _, mrec := range mrecs {
 				r, err = s.getter.getRecord(ctx, mrec)
 				// This is a deleted record
