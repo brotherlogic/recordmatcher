@@ -73,9 +73,6 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				s.Log(fmt.Sprintf("Could not find any master ids for %v", r.GetRelease().GetInstanceId()))
 			}
 
-			//Ensure we at least have one
-			matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
-
 			for _, mrec := range mrecs {
 				rin, err := s.getter.getRecord(ctx, mrec)
 				// This is a deleted record
@@ -93,6 +90,11 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 					rin.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNLISTENED {
 					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], rin)
 				}
+
+				//Ensure we at least have one
+				if len(matches) == 0 {
+					matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
+				}
 			}
 		} else {
 			mrecs, err := s.getter.getRecordsWithID(ctx, r.GetRelease().Id)
@@ -100,9 +102,6 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				return err
 			}
 			ll = fmt.Sprintf("WID,%v", len(mrecs))
-
-			//Ensure we at least have one
-			matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
 
 			for _, mrec := range mrecs {
 				r, err = s.getter.getRecord(ctx, mrec)
@@ -122,6 +121,10 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 				}
 			}
 
+			//Ensure we at least have one
+			if len(matches) == 0 {
+				matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
+			}
 		}
 	}
 
