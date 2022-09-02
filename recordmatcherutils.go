@@ -34,7 +34,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	for _, r := range recs {
 		val, ok := s.lastMap[r]
 		if ok && time.Since(val) < time.Hour*24 && !force {
-			s.Log(fmt.Sprintf("Skipping match of %v as we have done this recently: %v", recs, val))
+			s.CtxLog(ctx, fmt.Sprintf("Skipping match of %v as we have done this recently: %v", recs, val))
 			return nil
 		}
 	}
@@ -70,7 +70,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 			ll = fmt.Sprintf("MID,%v", len(mrecs))
 			if len(mrecs) == 0 {
-				s.Log(fmt.Sprintf("Could not find any master ids for %v", r.GetRelease().GetInstanceId()))
+				s.CtxLog(ctx, fmt.Sprintf("Could not find any master ids for %v", r.GetRelease().GetInstanceId()))
 			}
 
 			for _, mrec := range mrecs {
@@ -164,7 +164,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 		if len(records) == 1 {
 			//No match found
-			s.Log(fmt.Sprintf("FOUND NO MATCH %v -> %v", recs, lens))
+			s.CtxLog(ctx, fmt.Sprintf("FOUND NO MATCH %v -> %v", recs, lens))
 			return s.getter.update(ctx, records[0].GetRelease().GetInstanceId(), pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
 		}
 	}

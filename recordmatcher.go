@@ -34,7 +34,7 @@ type Server struct {
 
 type prodGetter struct {
 	dial func(ctx context.Context, server string) (*grpc.ClientConn, error)
-	log  func(log string)
+	log  func(ctx context.Context, log string)
 }
 
 func (p prodGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
@@ -107,7 +107,7 @@ func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, err
 }
 
 func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, existing pbrc.ReleaseMetadata_MatchState, source string) error {
-	p.log(fmt.Sprintf("%v: %v -> %v", i, match, existing))
+	p.log(ctx, fmt.Sprintf("%v: %v -> %v", i, match, existing))
 	if match == existing {
 		return nil
 	}
@@ -133,7 +133,7 @@ func Init() *Server {
 		GoServer: &goserver.GoServer{},
 		lastMap:  make(map[int32]time.Time),
 	}
-	s.getter = &prodGetter{dial: s.FDialServer, log: s.Log}
+	s.getter = &prodGetter{dial: s.FDialServer, log: s.CtxLog}
 	return s
 }
 
