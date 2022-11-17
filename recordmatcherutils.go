@@ -33,7 +33,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 func (s *Server) processRecordList(ctx context.Context, recs []int32, source string, force bool) error {
 	for _, r := range recs {
 		val, ok := s.lastMap[r]
-		if ok && time.Since(val) < time.Hour*24 && !force {
+		if ok && time.Since(val) < time.Minute*10 && !force {
 			s.CtxLog(ctx, fmt.Sprintf("Skipping match of %v as we have done this recently: %v", recs, val))
 			return nil
 		}
