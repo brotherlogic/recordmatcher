@@ -25,7 +25,7 @@ const (
 	KEY = "github.com/brotherlogic/recordmatcher/config"
 )
 
-//Server main server type
+// Server main server type
 type Server struct {
 	*goserver.GoServer
 	getter  getter
@@ -106,7 +106,7 @@ func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, err
 	return resp.GetInstanceIds(), nil
 }
 
-func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, existing pbrc.ReleaseMetadata_MatchState, source string) error {
+func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, existing pbrc.ReleaseMetadata_MatchState, source string, others []int32) error {
 	p.log(ctx, fmt.Sprintf("%v: %v -> %v", i, match, existing))
 	if match == existing {
 		return nil
@@ -124,6 +124,12 @@ func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetad
 			return err
 		}
 	}
+
+	for _, other := range others {
+		client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Reason: "ramatch", Requestor: "recordmatcher-" + source,
+			Update: &pbrc.Record{Release: &pbgd.Release{InstanceId: other}}})
+	}
+
 	return nil
 }
 

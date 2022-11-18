@@ -17,7 +17,7 @@ type getter interface {
 	getRecordsWithMaster(ctx context.Context, masterID int32) ([]int32, error)
 	getRecordsWithID(ctx context.Context, id int32) ([]int32, error)
 	getRecordsSince(ctx context.Context, t int64) ([]int32, error)
-	update(ctx context.Context, i int32, match, existing pbrc.ReleaseMetadata_MatchState, source string) error
+	update(ctx context.Context, i int32, match, existing pbrc.ReleaseMetadata_MatchState, source string, others []int32) error
 }
 
 func (s *Server) processRecords(ctx context.Context) error {
@@ -129,9 +129,11 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	}
 
 	s.CtxLog(ctx, fmt.Sprintf("MATCH for %v -> %v", recs, ll))
+	var others []int32
 
 	for _, recs := range matches {
 		for _, r := range recs {
+			others = append(others, r.GetRelease().GetInstanceId())
 			trackNumbers[r.GetRelease().InstanceId] = 0
 			for _, track := range r.GetRelease().Tracklist {
 				if track.TrackType == pbgd.Track_TRACK {
@@ -149,7 +151,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 			s.CtxLog(ctx, fmt.Sprintf(" adding %v and %v from %v", trackNumbers[records[0].GetRelease().InstanceId], trackNumbers[records[i].GetRelease().InstanceId], trackNumbers))
 			if trackNumbers[records[0].GetRelease().InstanceId] <= trackNumbers[records[i].GetRelease().InstanceId] {
 				if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_FULL_MATCH {
-					return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, records[0].GetMetadata().GetMatch(), source)
+					return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_FULL_MATCH, records[0].GetMetadata().GetMatch(), source, others)
 				}
 				return nil
 			}
@@ -157,7 +159,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 
 		if len(records) >= 2 {
 			if records[0].GetMetadata().Match != pbrc.ReleaseMetadata_PARTIAL_MATCH {
-				return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_PARTIAL_MATCH, records[0].GetMetadata().GetMatch(), source)
+				return s.getter.update(ctx, records[0].GetRelease().InstanceId, pbrc.ReleaseMetadata_PARTIAL_MATCH, records[0].GetMetadata().GetMatch(), source, others)
 			}
 			return nil
 		}
@@ -165,7 +167,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		if len(records) == 1 {
 			//No match found
 			s.CtxLog(ctx, fmt.Sprintf("FOUND NO MATCH %v -> %v", recs, lens))
-			return s.getter.update(ctx, records[0].GetRelease().GetInstanceId(), pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source)
+			return s.getter.update(ctx, records[0].GetRelease().GetInstanceId(), pbrc.ReleaseMetadata_NO_MATCH, records[0].GetMetadata().GetMatch(), source, others)
 		}
 	}
 
