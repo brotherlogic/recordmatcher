@@ -127,7 +127,7 @@ func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetad
 
 	for _, other := range others {
 		client.UpdateRecord(ctx, &pbrc.UpdateRecordRequest{Reason: "ramatch", Requestor: "recordmatcher-" + source,
-			Update: &pbrc.Record{Release: &pbgd.Release{InstanceId: other}}})
+			Update: &pbrc.Record{Release: &pbgd.Release{InstanceId: other}, Metadata: &pbrc.ReleaseMetadata{Match: match}}})
 	}
 
 	return nil
