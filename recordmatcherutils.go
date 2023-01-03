@@ -90,11 +90,10 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 					rin.GetMetadata().GetCategory() != pbrc.ReleaseMetadata_UNLISTENED {
 					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], rin)
 				}
-
-				//Ensure we at least have one
-				if len(matches) == 0 {
-					matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
-				}
+			}
+			//Ensure we at least have one
+			if len(matches) == 0 {
+				matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
 			}
 		} else {
 			mrecs, err := s.getter.getRecordsWithID(ctx, r.GetRelease().Id)
@@ -120,11 +119,10 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 					matches[r.GetRelease().MasterId] = append(matches[r.GetRelease().MasterId], r)
 				}
 			}
-
-			//Ensure we at least have one
-			if len(matches) == 0 {
-				matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
-			}
+		}
+		//Ensure we at least have one
+		if len(matches) == 0 {
+			matches[r.GetRelease().GetMasterId()] = append(matches[r.GetRelease().GetMasterId()], r)
 		}
 	}
 
