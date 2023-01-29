@@ -51,10 +51,9 @@ func main() {
 		sclient := rcpb.NewClientUpdateServiceClient(conn)
 
 		for i, id := range ids.GetInstanceIds() {
-			log.Printf("Pinging: %v / %v", i, len(ids.GetInstanceIds()))
 			_, err = sclient.ClientUpdate(ctx, &rcpb.ClientUpdateRequest{InstanceId: int32(id)})
 			if err != nil {
-				log.Fatalf("Error on GET: %v", err)
+				log.Fatalf("error on GET: %v", err)
 			}
 		}
 	}
