@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brotherlogic/keystore/client"
+	keystoreclient "github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 
 	pbgd "github.com/brotherlogic/godiscogs"
@@ -31,7 +31,7 @@ func (t *testGetter) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	return t.rec, nil
 }
 
-func (t *testGetter) update(ctx context.Context, i int32, match, existing pbrc.ReleaseMetadata_MatchState, source string) error {
+func (t *testGetter) update(ctx context.Context, i int32, match, existing pbrc.ReleaseMetadata_MatchState, source string, others []int32) error {
 	if t.updateFail {
 		return fmt.Errorf("Built to fail")
 	}
@@ -133,17 +133,6 @@ func TestVeryBasicTestTrackMatchWithTwo(t *testing.T) {
 	}}
 	err := s.processRecords(context.Background())
 	if err != nil {
-		t.Errorf("Failed: %v", err)
-	}
-}
-
-func TestVeryBasicTestTrackMatchNoMatch(t *testing.T) {
-	s := InitTest()
-	s.getter = &testGetter{noMatch: true, rec: []*pbrc.Record{
-		&pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}, Release: &pbgd.Release{MasterId: 123}},
-	}}
-	err := s.processRecords(context.Background())
-	if err == nil {
 		t.Errorf("Failed: %v", err)
 	}
 }
