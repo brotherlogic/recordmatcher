@@ -3,7 +3,7 @@ module github.com/brotherlogic/recordmatcher
 go 1.16
 
 require (
-	github.com/brotherlogic/datastore v0.0.0-20231118150449-69783e95a3fb // indirect
+	github.com/brotherlogic/gobuildslave v0.0.0-20231118165355-1f3689e6ecfc // indirect
 	github.com/brotherlogic/godiscogs v0.0.0-20230922000443-fb73651e941c
 	github.com/brotherlogic/goserver v0.0.0-20230726200050-779ae6811580
 	github.com/brotherlogic/keystore v0.0.0-20231112195839-4b61dfa63b0a
