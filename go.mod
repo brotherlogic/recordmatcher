@@ -9,7 +9,7 @@ require (
 	github.com/brotherlogic/keystore v0.0.0-20240213103345-50262d45c163
 	github.com/brotherlogic/recordcollection v0.0.0-20240209005803-0bcffbcab67b
 	github.com/golang/protobuf v1.5.3
-	golang.org/x/net v0.21.0
+	golang.org/x/net v0.23.0
 	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.33.0
 )
