@@ -13,11 +13,11 @@ import (
 )
 
 type getter interface {
-	getRecord(ctx context.Context, id int32) (*pbrc.Record, error)
-	getRecordsWithMaster(ctx context.Context, masterID int32) ([]int32, error)
-	getRecordsWithID(ctx context.Context, id int32) ([]int32, error)
-	getRecordsSince(ctx context.Context, t int64) ([]int32, error)
-	update(ctx context.Context, i int32, match, existing pbrc.ReleaseMetadata_MatchState, source string, others []int32) error
+	getRecord(ctx context.Context, id int64) (*pbrc.Record, error)
+	getRecordsWithMaster(ctx context.Context, masterID int32) ([]int64, error)
+	getRecordsWithID(ctx context.Context, id int32) ([]int64, error)
+	getRecordsSince(ctx context.Context, t int64) ([]int64, error)
+	update(ctx context.Context, i int64, match, existing pbrc.ReleaseMetadata_MatchState, source string, others []int64) error
 }
 
 func (s *Server) processRecords(ctx context.Context) error {
@@ -30,7 +30,7 @@ func (s *Server) processRecords(ctx context.Context) error {
 	return s.processRecordList(ctx, recs, "repeat", false)
 }
 
-func (s *Server) processRecordList(ctx context.Context, recs []int32, source string, force bool) error {
+func (s *Server) processRecordList(ctx context.Context, recs []int64, source string, force bool) error {
 	for _, r := range recs {
 		val, ok := s.lastMap[r]
 		if ok && time.Since(val) < time.Minute*10 && !force {
@@ -42,7 +42,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 		s.lastMap[r] = time.Now()
 	}
 	matches := make(map[int32][]*pbrc.Record)
-	trackNumbers := make(map[int32]int)
+	trackNumbers := make(map[int64]int)
 	ll := ""
 	for _, id := range recs {
 		r, err := s.getter.getRecord(ctx, id)
@@ -121,7 +121,7 @@ func (s *Server) processRecordList(ctx context.Context, recs []int32, source str
 	}
 
 	s.CtxLog(ctx, fmt.Sprintf("MATCH for %v -> %v", recs, ll))
-	var others []int32
+	var others []int64
 
 	for _, recs := range matches {
 		for _, r := range recs {

@@ -29,7 +29,7 @@ const (
 type Server struct {
 	*goserver.GoServer
 	getter  getter
-	lastMap map[int32]time.Time
+	lastMap map[int64]time.Time
 }
 
 type prodGetter struct {
@@ -37,7 +37,7 @@ type prodGetter struct {
 	log  func(ctx context.Context, log string)
 }
 
-func (p prodGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
+func (p prodGetter) getRecord(ctx context.Context, instanceID int64) (*pbrc.Record, error) {
 	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (p prodGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Reco
 	return resp.GetRecord(), nil
 }
 
-func (p prodGetter) getRecordsSince(ctx context.Context, t int64) ([]int32, error) {
+func (p prodGetter) getRecordsSince(ctx context.Context, t int64) ([]int64, error) {
 	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (p prodGetter) getRecordsSince(ctx context.Context, t int64) ([]int32, erro
 	return resp.GetInstanceIds(), nil
 }
 
-func (p prodGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32, error) {
+func (p prodGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int64, error) {
 	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func (p prodGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32,
 	return resp.GetInstanceIds(), nil
 }
 
-func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, error) {
+func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int64, error) {
 	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (p prodGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, err
 	return resp.GetInstanceIds(), nil
 }
 
-func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetadata_MatchState, existing pbrc.ReleaseMetadata_MatchState, source string, others []int32) error {
+func (p prodGetter) update(ctx context.Context, i int64, match pbrc.ReleaseMetadata_MatchState, existing pbrc.ReleaseMetadata_MatchState, source string, others []int64) error {
 	p.log(ctx, fmt.Sprintf("%v: %v -> %v", i, match, existing))
 	if match == existing {
 		return nil
@@ -137,7 +137,7 @@ func (p prodGetter) update(ctx context.Context, i int32, match pbrc.ReleaseMetad
 func Init() *Server {
 	s := &Server{
 		GoServer: &goserver.GoServer{},
-		lastMap:  make(map[int32]time.Time),
+		lastMap:  make(map[int64]time.Time),
 	}
 	s.getter = &prodGetter{dial: s.FDialServer, log: s.CtxLog}
 	return s

@@ -15,11 +15,11 @@ import (
 type testGetter struct {
 	fail          bool
 	rec           []*pbrc.Record
-	lastUpdated   int32
+	lastUpdated   int64
 	updateFail    bool
 	getFail       bool
 	getMasterFail bool
-	failNum       int32
+	failNum       int64
 	idFail        bool
 	noMatch       bool
 }
@@ -31,7 +31,7 @@ func (t *testGetter) getRecords(ctx context.Context) ([]*pbrc.Record, error) {
 	return t.rec, nil
 }
 
-func (t *testGetter) update(ctx context.Context, i int32, match, existing pbrc.ReleaseMetadata_MatchState, source string, others []int32) error {
+func (t *testGetter) update(ctx context.Context, i int64, match, existing pbrc.ReleaseMetadata_MatchState, source string, others []int64) error {
 	if t.updateFail {
 		return fmt.Errorf("Built to fail")
 	}
@@ -39,7 +39,7 @@ func (t *testGetter) update(ctx context.Context, i int32, match, existing pbrc.R
 	return nil
 }
 
-func (t *testGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
+func (t *testGetter) getRecord(ctx context.Context, instanceID int64) (*pbrc.Record, error) {
 	if t.getFail {
 		return nil, fmt.Errorf("Built to fail")
 	}
@@ -56,38 +56,38 @@ func (t *testGetter) getRecord(ctx context.Context, instanceID int32) (*pbrc.Rec
 	return t.rec[0], nil
 }
 
-func (t *testGetter) getRecordsSince(ctx context.Context, ti int64) ([]int32, error) {
+func (t *testGetter) getRecordsSince(ctx context.Context, ti int64) ([]int64, error) {
 	if t.fail {
-		return []int32{}, fmt.Errorf("Built to fail")
+		return []int64{}, fmt.Errorf("Built to fail")
 	}
-	return []int32{t.rec[0].GetRelease().InstanceId}, nil
+	return []int64{t.rec[0].GetRelease().InstanceId}, nil
 }
 
-func (t *testGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int32, error) {
+func (t *testGetter) getRecordsWithMaster(ctx context.Context, m int32) ([]int64, error) {
 	if t.getMasterFail {
-		return []int32{}, fmt.Errorf("Built to fail")
+		return []int64{}, fmt.Errorf("Built to fail")
 	}
 	if t.noMatch {
-		return []int32{}, nil
+		return []int64{}, nil
 	}
 
 	if len(t.rec) > 1 {
-		vals := []int32{}
+		vals := []int64{}
 		for _, id := range t.rec[1:] {
 			vals = append(vals, id.GetRelease().InstanceId)
 		}
 		return vals, nil
 	}
-	return []int32{t.rec[0].GetRelease().InstanceId}, nil
+	return []int64{t.rec[0].GetRelease().InstanceId}, nil
 }
-func (t *testGetter) getRecordsWithID(ctx context.Context, i int32) ([]int32, error) {
+func (t *testGetter) getRecordsWithID(ctx context.Context, i int32) ([]int64, error) {
 	if t.idFail {
-		return []int32{}, fmt.Errorf("Built to fail")
+		return []int64{}, fmt.Errorf("Built to fail")
 	}
 	if len(t.rec) > 1 {
-		return []int32{t.rec[1].GetRelease().InstanceId}, nil
+		return []int64{t.rec[1].GetRelease().InstanceId}, nil
 	}
-	return []int32{t.rec[0].GetRelease().InstanceId}, nil
+	return []int64{t.rec[0].GetRelease().InstanceId}, nil
 
 }
 
